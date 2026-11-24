@@ -21,8 +21,6 @@
       - parking-net
     volumes:
       - ./camera-drop/images:/usr/local/apache2/htdocs/images:ro
-    command: >
-      sh -c "echo 'Alias /api/manifest.json /usr/local/apache2/htdocs/images/manifest.json' >> /usr/local/apache2/conf/httpd.conf && httpd-foreground"
     restart: unless-stopped
 
 networks:
