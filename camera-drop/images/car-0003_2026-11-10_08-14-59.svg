@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a9bccd"/>
+      <stop offset="1" stop-color="#dde5eb"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#sky)"/>
+  <rect y="118" width="640" height="120" fill="#5b7a58"/>
+  <rect y="238" width="640" height="122" fill="#39415a"/>
+  <rect y="232" width="640" height="6" fill="#2c3448"/>
+  <rect x="80" y="150" width="470" height="110" rx="26" fill="#94a3b8"/>
+  <rect x="145" y="108" width="345" height="70" rx="20" fill="#7d8a99"/>
+  <rect x="163" y="118" width="138" height="52" rx="8" fill="#cfd8e0"/>
+  <rect x="323" y="118" width="138" height="52" rx="8" fill="#cfd8e0"/>
+  <circle cx="165" cy="262" r="26" fill="#151a24"/>
+  <circle cx="165" cy="262" r="11" fill="#c9d2de"/>
+  <circle cx="472" cy="262" r="26" fill="#151a24"/>
+  <circle cx="472" cy="262" r="11" fill="#c9d2de"/>
+  <rect x="293" y="218" width="124" height="34" rx="5" fill="#f4f7fa" stroke="#94a3b8" stroke-width="2"/>
+  <text x="355" y="241" text-anchor="middle" font-family="Arial" font-size="20" font-weight="700" fill="#1f2937">3-82-779</text>
+  <text x="18" y="34" font-family="Arial" font-size="18" font-weight="700" fill="#1f2937">CAM 1 · 2026-11-10 08:14:59</text>
+  <rect x="4" y="4" width="632" height="352" fill="none" stroke="#2c3448" stroke-width="8"/>
+</svg>

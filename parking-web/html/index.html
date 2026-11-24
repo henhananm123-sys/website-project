@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'">
+  <title>ניטור חניון — לוח בקרה לשומר</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-dot"></span>
+      <div class="brand-text">
+        <h1>ניטור חניון</h1>
+        <small>לוח בקרה לשומר</small>
+      </div>
+    </div>
+    <div class="topbar-meta">
+      <span id="conn" class="conn conn--wait" role="status">מתחבר…</span>
+      <span id="clock" class="clock">--:--:--</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="controls">
+      <label class="switch">
+        <input type="checkbox" id="auto" checked>
+        <span>רענון אוטומטי</span>
+      </label>
+      <select id="interval" title="מרווח הרענון האוטומטי">
+        <option value="3000">כל 3 שניות</option>
+        <option value="5000" selected>כל 5 שניות</option>
+        <option value="10000">כל 10 שניות</option>
+        <option value="30000">כל 30 שניות</option>
+      </select>
+      <button id="refresh" class="btn" type="button">רענן כעת</button>
+      <span id="stats" class="stats"></span>
+    </section>
+
+    <section id="alert" class="alert" hidden></section>
+
+    <section id="grid" class="grid" aria-live="polite"></section>
+    <p id="empty" class="empty" hidden>אין תמונות עדיין — להמתין לצילומים מהמצלמות (ולבדוק ששרת ה-Storage מחובר).</p>
+
+    <noscript><p class="empty">יש להפעיל JavaScript להצגת פיד התמונות.</p></noscript>
+  </main>
+
+  <footer class="foot">
+    <span>נתיבים: / (דשבורד) · /images/ (פרוקסי תמונות) · /api/ (פרוקסי מניפסט) · /healthz (בדיקת תקינות)</span>
+  </footer>
+
+  <!-- תצוגה מוגדלת (נפתחת בלחיצה על תמונה) -->
+  <div id="lightbox" class="lightbox" hidden>
+    <figure>
+      <img id="lightbox-img" alt="תצוגה מוגדלת">
+      <figcaption id="lightbox-cap"></figcaption>
+    </figure>
+  </div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+# =============================================================================
+# לוח הבקרה של שומר החניון — קונפיגורציית Nginx (תבנית)
+#
+# משתני הסביבה המוזרקים ב-envsubst בעליית הקונטיינר:
+#   STORAGE_SCHEME (ברירת מחדל: http)
+#   STORAGE_HOST   (ברירת מחדל: storage)
+#   STORAGE_PORT   (ברירת מחדל: 9000)
+# =============================================================================
+
+server {
+    listen 80;
+    server_name _;
+
+    root  /usr/share/nginx/html;
+    index index.html;
+
+    # אין צורך לאפשר העלאות גדולות דרך שרת ה-Web
+    client_max_body_size 8m;
+
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+    gzip_min_length 1024;
+
+    add_header X-Frame-Options SAMEORIGIN always;
+    add_header X-Content-Type-Options nosniff always;
+
+    # Docker DNS (127.0.0.11) — מאפשר proxy_pass מבוסס-משתנה עם פתרון שמות
+    # דינמי ברמת הריצה (שורד יצירה/הסרה מחדש של קונטיינר ה-Storage)
+    resolver 127.0.0.11 valid=30s ipv6=off;
+
+    set $storage "${STORAGE_SCHEME}://${STORAGE_HOST}:${STORAGE_PORT}";
+
+    # -------------------------------------------------------------
+    # בדיקת תקינות — בשימוש ב-HEALTHCHECK של ה-Dockerfile
+    # -------------------------------------------------------------
+    location = /healthz {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    # -------------------------------------------------------------
+    # קובצי הדשבורד (HTML/CSS/JS) — סטטיים מתוך הקונטיינר
+    # -------------------------------------------------------------
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # -------------------------------------------------------------
+    # Reverse Proxy אל שרת ה-Storage — תמונות רכב
+    # GET /images/<קובץ> ==> STORAGE_HOST:STORAGE_PORT/images/<קובץ>
+    # (proxy_pass ללא נתיב בסוף מעביר את הנתיב המקורי כמו שהוא)
+    # -------------------------------------------------------------
+    location /images/ {
+        limit_except GET { deny all; }    # קריאה בלבד
+
+        proxy_pass $storage;
+
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # מטמון לתמונות: הדפדפן לא יבקש אותן שוב ושוב בכל סבב רענון
+        expires 1h;
+
+        proxy_connect_timeout 5s;
+        proxy_read_timeout    30s;
+        proxy_buffers         8 16k;
+    }
+
+    # -------------------------------------------------------------
+    # Reverse Proxy אל שרת ה-Storage — מניפסט JSON עדכני לדשבורד
+    # GET /api/<מסלול>  ==>  STORAGE_HOST:STORAGE_PORT/api/<מסלול>
+    # דוגמה: /api/manifest.json
+    # -------------------------------------------------------------
+    location /api/ {
+        limit_except GET { deny all; }    # קריאה בלבד
+
+        proxy_pass $storage;
+
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        add_header Cache-Control "no-store";   # המניפסט חייב להיות עדכני
+
+        proxy_connect_timeout 5s;
+        proxy_read_timeout    30s;
+    }
+}

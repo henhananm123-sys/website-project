@@ -1,0 +1,31 @@
+# ==============================================================
+# הרצה מקומית של שירות ה-Web לבדיקה — ה-Storage כאן מדומה בלבד!
+# ב-compose המאוחד של הצוות: להעתיק את שירות `web` ולהסיר את `storage`.
+# ==============================================================
+
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"          # דפדפן השומר: http://localhost:8080
+    environment:
+      # כתובת שרת ה-Storage בתוך רשת ה-Docker
+      STORAGE_SCHEME: http
+      STORAGE_HOST: storage
+      STORAGE_PORT: "9000" # בגרשיים — כדי להבטיח שמדובר במחרוזת
+    depends_on:
+      - storage
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------
+  # Storage מדומה (nginx סטטי) — יוחלף מאוחר יותר בפתרון צוות ה-Storage
+  # ---------------------------------------------------------------
+  storage:
+    image: nginx:1.27-alpine
+    ports:
+      - "9001:9000"        # לבדיקה ישירה: http://localhost:9001/api/manifest.json
+    volumes:
+      - ./mock-storage/images:/usr/share/nginx/html/images:ro
+      - ./mock-storage/manifest.json:/usr/share/nginx/html/api/manifest.json:ro
+      - ./mock-storage/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped

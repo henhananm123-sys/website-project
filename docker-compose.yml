@@ -1,0 +1,31 @@
+﻿services:
+  web:
+    build: ./parking-web
+    container_name: parking_nginx_web
+    ports:
+      - "8080:80"
+    environment:
+      STORAGE_SCHEME: http
+      STORAGE_HOST: storage
+      STORAGE_PORT: "80"
+    networks:
+      - parking-net
+    depends_on:
+      - storage
+    restart: unless-stopped
+
+  storage:
+    image: httpd:2.4-alpine
+    container_name: parking_apache_storage
+    networks:
+      - parking-net
+    volumes:
+      - ./camera-drop/images:/usr/local/apache2/htdocs/images:ro
+    command: >
+      sh -c "echo 'Alias /api/manifest.json /usr/local/apache2/htdocs/images/manifest.json' >> /usr/local/apache2/conf/httpd.conf && httpd-foreground"
+    restart: unless-stopped
+
+networks:
+  parking-net:
+    driver: bridge
+    name: parking_internal_network
